@@ -56,4 +56,3 @@ if __name__ == "__main__":
     update_order()
     print("\nИтоговые остатки:")
     print(df)
-    print(123)

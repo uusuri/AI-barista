@@ -2,7 +2,7 @@ import telebot
 import threading
 from queue import Queue
 
-TOKEN = ""
+TOKEN = "8370067382:AAHJdPF_E3wBgIY2B-SgY4GHwfx64gMgabM"
 bot = telebot.TeleBot(TOKEN)
 
 subscribers = set()
