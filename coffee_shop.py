@@ -8,13 +8,12 @@ except FileNotFoundError:
     print("No coffee stock found")
     exit()
 
-
 def update_order():
     bill_summ = 0
     print("Текущие остатки:")
     print(df)
 
-    items_input = input("\nВведи    те названия позиций через запятую: ").strip()
+    items_input = input("\nВведите названия позиций через запятую: ").strip()
     items = [item.strip() for item in items_input.split(',') if item.strip()]
 
     amounts_input = input("Введите количества через запятую: ").strip()
@@ -51,6 +50,12 @@ def update_order():
     print(f"\nИтоговая стоимость: {bill_summ}")
     df.to_excel(path, index=False)
 
+def low_stack():
+    res = {}
+    for i in range(len(df["Название"].tolist())):
+        if df["Количество"].tolist()[i] <= 3:
+            res.update({df["Название"].tolist()[i]: df["Количество"].tolist()[i]})
+    return res
 
 if __name__ == "__main__":
     update_order()

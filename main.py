@@ -33,4 +33,5 @@ def chat_with_gigachat():
             print(f"Ошибка: {e}")
 
 if __name__ == "__main__":
-    chat_with_gigachat()
+    pass
+    # chat_with_gigachat()
