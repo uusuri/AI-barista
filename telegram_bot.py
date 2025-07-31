@@ -3,6 +3,7 @@ import threading
 import time
 import logging
 from queue import Queue, Empty
+from coffee_shop import low_stock
 
 bot = telebot.TeleBot('8370067382:AAHJdPF_E3wBgIY2B-SgY4GHwfx64gMgabM')
 
@@ -62,16 +63,15 @@ def handle_status(message):
 
 @bot.message_handler(commands=['inventory'])
 def handle_inventory(message):
-    low_stock = {"Кофе": 5, "Молоко": 3, "Сахар": 2}
+    bot.reply_to(message, low_stock())
 
-    response = "⚠️ Низкие запасы:\n"
-    response += "\n".join([f"- {product}: {qty} кг" for product, qty in low_stock.items()])
 
-    bot.reply_to(message, response)
+def notification():
+    if time = 18:00:
+    handle_inventory()
 
 
 def notify_low_stock(product_name):
-    """Постановка уведомления в очередь (вызывается из основной программы)"""
     if not active.is_set():
         logger.warning("Bot is shutting down. Notification discarded.")
         return
@@ -81,7 +81,6 @@ def notify_low_stock(product_name):
 
 
 def notification_worker():
-    """Рабочий поток для обработки уведомлений"""
     logger.info("Notification worker started")
     while active.is_set() or not notification_queue.empty():
         try:

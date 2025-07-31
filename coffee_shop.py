@@ -50,12 +50,12 @@ def update_order():
     print(f"\nИтоговая стоимость: {bill_summ}")
     df.to_excel(path, index=False)
 
-def low_stack():
+def low_stock():
     res = {}
     for i in range(len(df["Название"].tolist())):
         if df["Количество"].tolist()[i] <= 3:
             res.update({df["Название"].tolist()[i]: df["Количество"].tolist()[i]})
-    return res
+    return str(res)
 
 if __name__ == "__main__":
     update_order()
