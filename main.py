@@ -5,12 +5,10 @@ giga = GigaChat(credentials='NTY0Yjc3MTktMmExYy00YWIzLWJkOTMtOTU0YzE2MzJjNzlmOmY
 
 def recognize_speech():
     r = sr.Recognizer()
-
     with sr.Microphone() as source:
         r.adjust_for_ambient_noise(source)
         audio = r.listen(source, phrase_time_limit = 10)
         text = r.recognize_google(audio, language = "ru-RU")
-
         return text
 
 def chat_with_gigachat():
@@ -33,5 +31,4 @@ def chat_with_gigachat():
             print(f"Ошибка: {e}")
 
 if __name__ == "__main__":
-    pass
-    # chat_with_gigachat()
+    chat_with_gigachat()
