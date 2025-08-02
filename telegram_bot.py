@@ -1,9 +1,9 @@
-import schedule
 import time
 import pytz
-from datetime import datetime
 import telebot
+import schedule
 import threading
+from datetime import datetime
 from coffee_shop import low_stock
 
 MOSCOW_TZ = pytz.timezone('Europe/Moscow')
@@ -19,9 +19,9 @@ def start(message):
     with subscribers_lock:
         if chat_id not in subscribers:
             subscribers.add(chat_id)
-            bot.reply_to(message, "✅ Вы подписались на уведомления!")
+            bot.reply_to(message, "Вы подписались на уведомления!")
         else:
-            bot.reply_to(message, "ℹ️ Вы уже подписаны")
+            bot.reply_to(message, "Вы уже подписаны")
 
 @bot.message_handler(commands=['stop'])
 def stop(message):
@@ -29,9 +29,9 @@ def stop(message):
     with subscribers_lock:
         if chat_id in subscribers:
             subscribers.remove(chat_id)
-            bot.reply_to(message, "❌ Вы отписались от уведомлений")
+            bot.reply_to(message, "Вы отписались от уведомлений")
         else:
-            bot.reply_to(message, "ℹ️ Вы не были подписаны")
+            bot.reply_to(message, "Вы не были подписаны")
 
 @bot.message_handler(commands=['inventory'])
 def handle_inventory(message):
@@ -41,7 +41,7 @@ def handle_inventory(message):
 def send_scheduled_notification():
     try:
         inventory_list = low_stock()
-        message = "🕒 Ежедневный отчет по инвентарю:\n\n" + inventory_list
+        message = "Ежедневный отчет по инвентарю:\n\n" + inventory_list
         with subscribers_lock:
             current_subscribers = list(subscribers)
 

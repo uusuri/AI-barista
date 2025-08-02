@@ -5,7 +5,7 @@ path = "/Users/uusuri/Documents/PycharmProjects/Education/coffee_stock.xlsx"
 try:
     df = pd.read_excel(path)
 except FileNotFoundError:
-    print("❌ Файл с остатками не найден!")
+    print("Файл с остатками не найден!")
     exit()
 
 
@@ -17,20 +17,20 @@ def validate_input(item, amount_str, mode="order"):
     try:
         amount = int(amount_str)
         if mode == "order" and amount <= 0:
-            print(f"⚠️ Для '{item}': введите число больше 0!")
+            print(f"Для '{item}': введите число больше 0!")
             return None
         elif mode == "restock" and amount < 0:
-            print(f"⚠️ Для '{item}': количество не может быть отрицательным!")
+            print(f"Для '{item}': количество не может быть отрицательным!")
             return None
     except ValueError:
-        print(f"❌ Для '{item}': введите целое число!")
+        print(f"Для '{item}': введите целое число!")
         return None
     return amount
 
 
 def update_stock(item, amount, mode="order"):
     if item not in df["Название"].values:
-        print(f"❌ Ошибка: '{item}' нет в списке!")
+        print(f"Ошибка: '{item}' нет в списке!")
         return False, 0
 
     index = df.index[df["Название"] == item].tolist()[0]
@@ -42,22 +42,22 @@ def update_stock(item, amount, mode="order"):
             return False, 0
         df.at[index, "Количество"] -= amount
         cost = df.at[index, "Стоимость"] * amount
-        print(f"✅ Обновлено: {item} -{amount}. Остаток: {df.at[index, 'Количество']}")
+        print(f"Обновлено: {item} -{amount}. Остаток: {df.at[index, 'Количество']}")
         return True, cost
-    else:  # restock
+    else:
         df.at[index, "Количество"] = amount
-        print(f"✅ Обновлено: {item} → {amount}")
+        print(f"Обновлено: {item} -> {amount}")
         return True, 0
 
 
 def restock_items():
-    print("\n🔹 Режим пополнения остатков:")
+    print("\nРежим пополнения остатков:")
     print(df)
     items = split_input(input("Введите названия позиций через запятую: "))
     amounts = split_input(input("Введите новые количества через запятую: "))
 
     if len(items) != len(amounts):
-        print("❌ Ошибка: количество позиций не совпадает с количеством чисел!")
+        print("Ошибка: количество позиций не совпадает с количеством чисел!")
         return
 
     for item, amount_str in zip(items, amounts):
@@ -71,7 +71,7 @@ def restock_items():
 
 
 def process_order():
-    print("\n🔹 Текущие остатки:")
+    print("\nТекущие остатки:")
     print(df)
 
     user_input = input("\nВведите названия напитков через запятую или 'Пополнить': ").strip()
@@ -84,7 +84,7 @@ def process_order():
     amounts = split_input(input("Введите количества через запятую: "))
 
     if len(items) != len(amounts):
-        print("❌ Ошибка: количество напитков не совпадает с количеством чисел!")
+        print("Ошибка: количество напитков не совпадает с количеством чисел!")
         return
 
     total_cost = 0
