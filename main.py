@@ -1,47 +1,47 @@
-import vosk
-import pyaudio
-from gigachat import GigaChat
-
-giga = GigaChat(credentials='NTY0Yjc3MTktMmExYy00YWIzLWJkOTMtOTU0YzE2MzJjNzlmOmY5MTdmN2I4LTFlNzAtNDlmNC1hN2RlLTc1OTM1ZDJhZWQ2OQ==', verify_ssl_certs=False)
-
-
-def recognize_speech_vosk():
-    model = vosk.Model("/Users/uusuri/PycharmProjects/AI-barista/vosk-model-ru-0.42")
-    recognizer = vosk.KaldiRecognizer(model, 16000)
-
-    mic = pyaudio.PyAudio()
-    stream = mic.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8192)
-
-    print("Говорите... (для остановки нажмите Ctrl+C)")
-    while True:
-        data = stream.read(4096)
-        if recognizer.AcceptWaveform(data):
-            return vosk_result_to_text(recognizer.Result())
+from core.infrastructure.database.database_manager import DatabaseManager
+from core.infrastructure.database.repositories import (
+    MenuRepository,
+    SyrupRepository,
+    StockRepository
+)
+from core.infrastructure.services import MenuService
 
 
-def vosk_result_to_text(result):
-    import json
-    return json.loads(result)["text"]
+def main():
+    db = DatabaseManager()
+    conn = db.get_connection()
 
+    syrup_repo = SyrupRepository(conn)
+    menu_repo = MenuRepository(conn)
+    stock_repo = StockRepository(conn)
+    menu_service = MenuService(menu_repo, stock_repo)
 
-def chat_with_gigachat():
-    print("💬 GigaChat Console (Cкажите 'выход' чтобы закрыть)")
-    giga.chat(open("/Users/uusuri/Documents/PycharmProjects/Education/.venv/rules/rules.txt", "r").read())
+    syrup_repo.create_table()
 
-    while True:
-        user_input = recognize_speech_vosk()
-        print(user_input)
+    try:
+        action = input("Действие (add/update/delete/stock): ").lower()
 
-        if user_input.lower() in ["выход", "exit", "quit", "q"]:
-            print("До свидания!")
-            break
+        if action == "add":
+            name = input("Название: ")
+            price = float(input("Цена: "))
+            menu_service.add_menu_item(name, price)
 
-        try:
-            response = giga.chat(user_input)
-            print(f"GigaChat: {response.choices[0].message.content}")
+        if action == "update":
+            name = input("Введите название обновляемой позиции: ")
+            price = float(input("Введите стоимость обновляемой позиции: "))
+            is_available = input("Доступна ли данная позиция по умолчанию (true/false): ").lower() == "true"
+            menu_service.update_menu_item(name, price, is_available)
 
-        except Exception as e:
-            print(f"Ошибка: {e}")
+        elif action == "stock":
+            print(menu_service.get_low_stock_alert())
+
+        elif action == "recipe":
+            name = input("Введите название позиции: ")
+            menu_service.get_recipe(name)
+
+    finally:
+        conn.close()
+
 
 if __name__ == "__main__":
-    chat_with_gigachat()
+    main()
