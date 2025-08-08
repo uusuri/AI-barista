@@ -62,8 +62,9 @@ class OrderService:
             if not recipe:
                 raise ValueError(f"Рецепт для '{item.menu_item_name}' не найден")
 
-            for ing, qty in recipe.items():
-                ingredients_needed[ing] = ingredients_needed.get(ing, 0) + qty * item.quantity
+            for ing, data in recipe.items():
+                amount = data["amount"]
+                ingredients_needed[ing] = ingredients_needed.get(ing, 0) + amount * item.quantity
 
             if item.syrup_name and item.syrup_quantity:
                 syrups_needed[item.syrup_name] = syrups_needed.get(item.syrup_name, 0) + item.syrup_quantity
