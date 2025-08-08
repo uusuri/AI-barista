@@ -49,7 +49,7 @@ class MenuRepository:
 
     def get_price(self, menu_item_name: str) -> float:
         cursor = self.conn.cursor()
-        cursor.execute("SELECT base_price FROM menu_items WHERE name = ?", (menu_item_name,))
+        cursor.execute("SELECT price FROM menu WHERE name = ?", (menu_item_name,))
         row = cursor.fetchone()
         if not row:
             raise ValueError(f"Цена для напитка '{menu_item_name}' не найдена")

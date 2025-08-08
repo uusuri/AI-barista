@@ -5,21 +5,40 @@ class StockRepository:
     def __init__(self, conn: sqlite3.Connection):
         self.conn = conn
 
-    def consume_items(self, items: Dict[str, float], item_type: str) -> bool:
+    def consume_items(self, items: Dict[str, float], ingredient_type: str) -> bool:
         cursor = self.conn.cursor()
-        table = 'ingredients' if item_type == 'ingredient' else 'syrup'
 
-        for name, qty in items.items():
-            cursor.execute(f"SELECT stock FROM {table} WHERE name = ?", (name,))
+        for name, amount in items.items():
+            if ingredient_type == 'ingredient':
+                cursor.execute(
+                    "SELECT current_quantity FROM ingredients WHERE name = ?",
+                    (name,)
+                )
+            elif ingredient_type == 'syrup':
+                cursor.execute(
+                    "SELECT current_quantity FROM syrup WHERE name = ?",
+                    (name,)
+                )
+            else:
+                raise ValueError("Неизвестный тип ингредиента")
+
             row = cursor.fetchone()
-            if not row or row[0] < qty:
+            if not row or row[0] < amount:
                 return False
 
-        for name, qty in items.items():
-            cursor.execute(
-                f"UPDATE {table} SET stock = stock - ? WHERE name = ?",
-                (qty, name)
-            )
+        for name, amount in items.items():
+            if ingredient_type == 'ingredient':
+                cursor.execute(
+                    "UPDATE ingredients SET current_quantity = current_quantity - ? WHERE name = ?",
+                    (amount, name)
+                )
+            elif ingredient_type == 'syrup':
+                cursor.execute(
+                    "UPDATE syrup SET current_quantity = current_quantity - ? WHERE name = ?",
+                    (amount, name)
+                )
+
+        self.conn.commit()
         return True
 
 

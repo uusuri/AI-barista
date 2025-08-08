@@ -1,3 +1,5 @@
+from annotated_types.test_cases import cases
+
 from core.infrastructure.database.database_manager import DatabaseManager
 from core.infrastructure.database.repositories import (
     MenuRepository,
@@ -27,12 +29,12 @@ def main():
         action = input("Действие (add/update/delete/stock/recipe/order): ").lower()
 
         if action == "add":
-            name = input("Название: ")
+            name = input("Название: ").strip()
             price = float(input("Цена: "))
             menu_service.add_menu_item(name, price)
 
         elif action == "update":
-            name = input("Введите название обновляемой позиции: ")
+            name = input("Введите название обновляемой позиции: ").strip()
             price = float(input("Введите стоимость обновляемой позиции: "))
             is_available = input("Доступна ли данная позиция по умолчанию (true/false): ").lower() == "true"
             menu_service.update_menu_item(name, price, is_available)
@@ -40,13 +42,17 @@ def main():
         elif action == "stock":
             print(menu_service.get_low_stock_alert())
 
+        elif action == "price":
+            name = input("Введите название позиции: ").strip()
+            print(menu_service.get_price(name))
+
         elif action == "recipe":
-            name = input("Введите название позиции: ")
+            name = input("Введите название позиции: ").strip()
             print(menu_service.get_recipe(name))
 
         elif action == "order":
-            customer_name = input("Имя клиента: ")
-            menu_item_name = input("Название напитка: ")
+            customer_name = input("Имя клиента: ").strip()
+            menu_item_name = input("Название напитка: ").strip()
             quantity = int(input("Количество: "))
 
             use_syrup = input("Добавить сироп? (y/n): ").lower() == "y"
@@ -54,8 +60,8 @@ def main():
             syrup_quantity = None
 
             if use_syrup:
-                syrup_name = input("Название сиропа: ")
-                syrup_quantity = int(input("Количество сиропа (в мл): "))
+                syrup_name = input("Название сиропа: ").strip()
+                syrup_quantity = int(input("Количество сиропа (в мл): ")).strip()
 
             order_item = OrderItem(
                 menu_item_name=menu_item_name,
