@@ -1,33 +1,36 @@
 import sqlite3
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 class StockRepository:
-    def __init__(self, connection: sqlite3.Connection):
-        self.conn = connection
+    def __init__(self, conn: sqlite3.Connection):
+        self.conn = conn
 
-    def consume_ingredients(self, items: dict[str, float]) -> bool:
-        try:
-            with self.conn:
-                for name, amount in items.items():
-                    check_query = """SELECT 1 FROM ingredients WHERE name = ? AND current_quantity >= ?"""
-                    if not self.conn.execute(check_query, (name, amount,)).fetchone():
-                        return False
+    def consume_items(self, items: Dict[str, float], item_type: str) -> bool:
+        cursor = self.conn.cursor()
+        table = 'ingredients' if item_type == 'ingredient' else 'syrup'
 
-                for name, amount in items.items():
-                    update_query = """
-                                UPDATE ingredients 
-                                SET current_quantity = current_quantity - ? 
-                                WHERE name = ?
-                                """
-                    self.conn.execute(update_query, (amount, name))
-                return True
-        except sqlite3.OperationalError:
-            return False
+        for name, qty in items.items():
+            cursor.execute(f"SELECT stock FROM {table} WHERE name = ?", (name,))
+            row = cursor.fetchone()
+            if not row or row[0] < qty:
+                return False
+
+        for name, qty in items.items():
+            cursor.execute(
+                f"UPDATE {table} SET stock = stock - ? WHERE name = ?",
+                (qty, name)
+            )
+        return True
+
 
     def get_low_stock_items(self) -> List[Tuple[str, float]]:
         query = """
         SELECT name, current_quantity 
         FROM ingredients 
+        WHERE current_quantity < min_quantity
+        UNION ALL
+        SELECT name, current_quantity 
+        FROM syrups 
         WHERE current_quantity < min_quantity
         ORDER BY current_quantity ASC
         """
@@ -36,3 +39,10 @@ class StockRepository:
                 (row["name"], row["current_quantity"])
                 for row in self.conn.execute(query).fetchall()
             ]
+
+    def get_current_quantity(self, item_name: str, item_type: str) -> float:
+        table = 'ingredients' if item_type == 'ingredient' else 'syrups'
+        query = f"SELECT current_quantity FROM {table} WHERE name = ?"
+        with self.conn:
+            result = self.conn.execute(query, (item_name,)).fetchone()
+            return result[0] if result else 0.0

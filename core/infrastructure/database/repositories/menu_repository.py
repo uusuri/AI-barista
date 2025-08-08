@@ -1,5 +1,6 @@
 import sqlite3
 from dataclasses import dataclass
+from typing import Dict
 
 @dataclass
 class MenuItem:
@@ -23,10 +24,45 @@ class MenuRepository:
         with self.conn:
             self.conn.execute(query, (price, is_available, name))
 
-    def get_recipe(self, item_name:str) -> dict[str, float]:
-        query = "SELECT ingredient_name, quantity FROM recipe WHERE name = ?"
-        with self.conn:
-            return dict(self.conn.execute(query, (item_name,)).fetchall())
+    def get_recipe(self, menu_item_name: str) -> Dict[str, Dict[str, float]]:
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            SELECT ingredient_name, quantity, ingredient_type
+            FROM recipe
+            WHERE menu_item_name = ?
+            """,
+            (menu_item_name,)
+        )
+        rows = cursor.fetchall()
+        if not rows:
+            return {}
+
+        recipe = {'ingredient': {}, 'syrup': {}}
+        for name, amount, ingredient_type in rows:
+            if ingredient_type not in recipe:
+                continue
+            recipe[ingredient_type][name] = recipe[ingredient_type].get(name, 0) + amount
+
+        return recipe
+
+
+    def get_price(self, menu_item_name: str) -> float:
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT base_price FROM menu_items WHERE name = ?", (menu_item_name,))
+        row = cursor.fetchone()
+        if not row:
+            raise ValueError(f"Цена для напитка '{menu_item_name}' не найдена")
+        return row[0]
+
+    def get_syrup_price(self, syrup_name: str) -> float:
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT price FROM syrup WHERE name = ?", (syrup_name,))
+        row = cursor.fetchone()
+        if not row:
+            raise ValueError(f"Цена для сиропа '{syrup_name}' не найдена")
+        return row[0]
+
 
     def delete_item(self, item_id: int) -> None:
         query = "DELETE FROM menu WHERE id = ?"

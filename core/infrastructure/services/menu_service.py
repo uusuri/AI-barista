@@ -21,7 +21,7 @@ class MenuService:
             return "Все ингредиенты в норме"
         return "\n".join(f"{name}: {qty}" for name, qty in low_stock)
 
-    def get_recipe(self, name:str) -> dict[str, float]:
+    def get_recipe(self, name:str) -> dict[str, dict[str, float]]:
         recipe = self.menu_repo.get_recipe(name)
         if not recipe:
             raise ValueError(f"Рецепт для '{name}' не найден")

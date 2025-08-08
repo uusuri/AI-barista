@@ -2,46 +2,56 @@ import sqlite3
 
 
 class OrderRepository:
-    def __init__(self, connection: sqlite3.Connection):
-        self.conn = connection
+    def __init__(self, conn: sqlite3.Connection):
+        self.conn = conn
 
-    def create_order(
-            self,
-            customer_name: str,
-            menu_item_name: str,
-            order_summ: float,
-            type_of_payment: str,
-            syrup_name: str = None,
-            syrup_quantity: int = None
-    ) -> int:
-        query = """
-        INSERT INTO orders (
-            customer_name,
-            menu_item_name,
-            syrup_name,
-            syrup_quantity,
-            order_summ,
-            type_of_payment
-        ) VALUES (?, ?, ?, ?, ?, ?)
-        """
-        params = (
-            customer_name,
-            menu_item_name,
-            syrup_name,
-            syrup_quantity,
-            order_summ,
-            type_of_payment
+    def create_order(self, customer_name: str, total_sum: float, type_of_payment: str) -> int:
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO orders (customer_name, order_time, total_sum, type_of_payment)
+            VALUES (?, datetime('now'), ?, ?)
+            """,
+            (customer_name, total_sum, type_of_payment)
         )
+        return cursor.lastrowid
 
-        with self.conn:
-            cursor = self.conn.execute(query, params)
-            return cursor.lastrowid
+    def add_order_item(
+        self,
+        order_id: int,
+        menu_item_name: str,
+        quantity: int,
+        item_price: float,
+        syrup_name: str = None,
+        syrup_quantity: int = None
+    ) -> int:
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO order_items 
+            (order_id, menu_item_name, quantity, item_price) 
+            VALUES (?, ?, ?, ?)
+            """,
+            (order_id, menu_item_name, quantity, item_price)
+        )
+        item_id = cursor.lastrowid
 
-    def get_order_details(self, order_id: int) -> dict:
-        query = """
-        SELECT * FROM orders 
-        WHERE id = ?
-        """
-        with self.conn:
-            row = self.conn.execute(query, (order_id,)).fetchone()
-            return dict(row) if row else None
+        if syrup_name and syrup_quantity:
+            self.add_syrup_to_item(item_id, syrup_name, syrup_quantity)
+
+        return item_id
+
+    def add_syrup_to_item(
+        self,
+        item_id: int,
+        syrup_name: str,
+        syrup_quantity: int
+    ):
+        self.conn.cursor().execute(
+            """
+            INSERT INTO order_item_syrups 
+            (order_item_id, syrup_name, syrup_quantity) 
+            VALUES (?, ?, ?)
+            """,
+            (item_id, syrup_name, syrup_quantity)
+        )
