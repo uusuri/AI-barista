@@ -16,7 +16,7 @@ class StockRepository:
                 )
             elif ingredient_type == 'syrup':
                 cursor.execute(
-                    "SELECT current_quantity FROM syrup WHERE name = ?",
+                    "SELECT current_quantity FROM syrups WHERE name = ?",
                     (name,)
                 )
             else:
@@ -34,7 +34,7 @@ class StockRepository:
                 )
             elif ingredient_type == 'syrup':
                 cursor.execute(
-                    "UPDATE syrup SET current_quantity = current_quantity - ? WHERE name = ?",
+                    "UPDATE syrups SET current_quantity = current_quantity - ? WHERE name = ?",
                     (amount, name)
                 )
 

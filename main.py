@@ -1,9 +1,6 @@
-from annotated_types.test_cases import cases
-
 from core.infrastructure.database.database_manager import DatabaseManager
 from core.infrastructure.database.repositories import (
     MenuRepository,
-    SyrupRepository,
     StockRepository,
     OrderRepository
 )
@@ -12,18 +9,14 @@ from core.infrastructure.services import OrderItem
 
 
 def main():
-    db = DatabaseManager()
-    conn = db.get_connection()
+    conn = DatabaseManager().get_connection()
 
-    syrup_repo = SyrupRepository(conn)
     menu_repo = MenuRepository(conn)
     stock_repo = StockRepository(conn)
     order_repo = OrderRepository(conn)
 
     menu_service = MenuService(menu_repo, stock_repo)
     order_service = OrderService(stock_repo, menu_repo, order_repo)
-
-    syrup_repo.create_table()
 
     try:
         action = input("Действие (add/update/delete/stock/recipe/order): ").lower()
@@ -54,14 +47,10 @@ def main():
             customer_name = input("Имя клиента: ").strip()
             menu_item_name = input("Название напитка: ").strip()
             quantity = int(input("Количество: "))
-
             use_syrup = input("Добавить сироп? (y/n): ").lower() == "y"
-            syrup_name = None
-            syrup_quantity = None
-
-            if use_syrup:
-                syrup_name = input("Название сиропа: ").strip()
-                syrup_quantity = int(input("Количество сиропа (в мл): ")).strip()
+            syrup_name = input("Название сиропа: ").strip() if use_syrup else None
+            syrup_quantity = int(input("Количество сиропа (в мл): ")) if use_syrup else None
+            payment_type = input("Тип оплаты (cash/card): ").lower()
 
             order_item = OrderItem(
                 menu_item_name=menu_item_name,
@@ -69,8 +58,6 @@ def main():
                 syrup_name=syrup_name,
                 syrup_quantity=syrup_quantity
             )
-
-            payment_type = input("Тип оплаты (cash/card): ").lower()
 
             try:
                 result = order_service.create_order(

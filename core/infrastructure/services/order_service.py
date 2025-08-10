@@ -125,7 +125,7 @@ class OrderService:
         total_price = base_price * item.quantity
 
         if item.syrup_name and item.syrup_quantity:
-            syrup_price_per_10ml = self.menu_repo.get_syrup_price(item.syrup_name)
+            syrup_price_per_10ml = self.menu_repo.get_price(item.syrup_name)
             syrup_price = (item.syrup_quantity / 10) * syrup_price_per_10ml
             total_price += syrup_price * item.quantity
 
