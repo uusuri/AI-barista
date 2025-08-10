@@ -5,6 +5,18 @@ class StockRepository:
     def __init__(self, conn: sqlite3.Connection):
         self.conn = conn
 
+    def has_items(self, items: Dict[str, float], ingredient_type: str) -> bool:
+        cursor = self.conn.cursor()
+        for name, amount in items.items():
+            if ingredient_type == 'ingredient':
+                cursor.execute("SELECT current_quantity FROM ingredients WHERE name = ?", (name,))
+            else:
+                cursor.execute("SELECT current_quantity FROM syrup WHERE name = ?", (name,))
+            row = cursor.fetchone()
+            if not row or row[0] < amount:
+                return False
+        return True
+
     def consume_items(self, items: Dict[str, float], ingredient_type: str) -> bool:
         cursor = self.conn.cursor()
 
