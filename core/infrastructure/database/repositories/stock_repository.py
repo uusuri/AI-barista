@@ -11,7 +11,7 @@ class StockRepository:
             if ingredient_type == 'ingredient':
                 cursor.execute("SELECT current_quantity FROM ingredients WHERE name = ?", (name,))
             else:
-                cursor.execute("SELECT current_quantity FROM syrup WHERE name = ?", (name,))
+                cursor.execute("SELECT current_quantity FROM syrups WHERE name = ?", (name,))
             row = cursor.fetchone()
             if not row or row[0] < amount:
                 return False
