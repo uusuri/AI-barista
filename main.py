@@ -44,6 +44,7 @@ def main():
             print(menu_service.get_recipe(name))
 
 
+
         elif action == "order":
             customer_name = input("Имя клиента: ").strip()
             print("Введите напитки по одному в строке (пустая строка — конец ввода):")
@@ -53,21 +54,31 @@ def main():
                 line = input().strip()
                 if not line:
                     break
-
                 parts = line.split()
-                menu_item_name = parts[0].strip()
-                syrup_name = None
-                syrup_quantity = None
 
-                if len(parts) > 3 and parts[1].lower() == "сироп":
-                    syrup_name = " ".join(parts[2:-1]).strip()
+                try:
+                    quantity = int(parts[-1])
+                except ValueError:
+                    raise ValueError("В конце строки должно быть количество напитков")
+
+                parts = parts[:-1]
+
+                if "сироп" in parts:
+                    syrup_index = parts.index("сироп")
+                    menu_item_name = " ".join(parts[:syrup_index]).strip()
 
                     try:
-                        syrup_quantity = int(parts[-1].strip())
-                    except ValueError:
-                        raise ValueError("Количество сиропа должно быть числом")
+                        syrup_quantity = int(parts[-1])  # мл сиропа
+                        syrup_name = " ".join(parts[syrup_index + 1:-1]).strip()
 
-                quantity = int(input(f"Количество для '{menu_item_name}': "))
+                    except ValueError:
+                        syrup_quantity = None
+                        syrup_name = " ".join(parts[syrup_index + 1:]).strip()
+
+                else:
+                    menu_item_name = " ".join(parts).strip()
+                    syrup_name = None
+                    syrup_quantity = None
 
                 order_items.append(OrderItem(
                     menu_item_name=menu_item_name,
