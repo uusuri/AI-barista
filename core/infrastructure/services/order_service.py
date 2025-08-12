@@ -72,7 +72,6 @@ class OrderService:
             if item.syrup_name and item.syrup_quantity:
                 syrups_needed[item.syrup_name] = syrups_needed.get(item.syrup_name, 0) + item.syrup_quantity
 
-        # Проверка без списания
         if not self.stock_repo.has_items(ingredients_needed, 'ingredient'):
             raise ValueError("Недостаточно ингредиентов на складе")
 
@@ -110,6 +109,9 @@ class OrderService:
 
         for item in order_items:
             recipe = self.menu_repo.get_recipe(item.menu_item_name)
+
+            if item.syrup_name and item.syrup_quantity:
+                syrups_needed[item.syrup_name] = item.syrup_quantity
 
             for ing_name, qty in recipe.get('ingredient', {}).items():
                 ingredients_needed[ing_name] = ingredients_needed.get(ing_name, 0) + qty * item.quantity
