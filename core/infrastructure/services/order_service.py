@@ -53,6 +53,7 @@ class OrderService:
         except Exception as e:
             raise ValueError(f"Ошибка создания заказа: {str(e)}")
 
+
     def _check_ingredients_availability(self, order_items: List[OrderItem]) -> None:
         ingredients_needed = {}
         syrups_needed = {}
@@ -71,11 +72,12 @@ class OrderService:
             if item.syrup_name and item.syrup_quantity:
                 syrups_needed[item.syrup_name] = syrups_needed.get(item.syrup_name, 0) + item.syrup_quantity
 
-        if not self.stock_repo.consume_items(ingredients_needed, 'ingredient'):
+        if not self.stock_repo.has_items(ingredients_needed, 'ingredient'):
             raise ValueError("Недостаточно ингредиентов на складе")
 
-        if syrups_needed and not self.stock_repo.consume_items(syrups_needed, 'syrup'):
+        if syrups_needed and not self.stock_repo.has_items(syrups_needed, 'syrup'):
             raise ValueError("Недостаточно сиропов на складе")
+
 
     def create_order_record(
             self,
@@ -107,6 +109,9 @@ class OrderService:
 
         for item in order_items:
             recipe = self.menu_repo.get_recipe(item.menu_item_name)
+
+            if item.syrup_name and item.syrup_quantity:
+                syrups_needed[item.syrup_name] = item.syrup_quantity
 
             for ing_name, qty in recipe.get('ingredient', {}).items():
                 ingredients_needed[ing_name] = ingredients_needed.get(ing_name, 0) + qty * item.quantity

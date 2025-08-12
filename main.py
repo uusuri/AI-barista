@@ -43,26 +43,56 @@ def main():
             name = input("Введите название позиции: ").strip()
             print(menu_service.get_recipe(name))
 
+
+
         elif action == "order":
             customer_name = input("Имя клиента: ").strip()
-            menu_item_name = input("Название напитка: ").strip()
-            quantity = int(input("Количество: "))
-            use_syrup = input("Добавить сироп? (y/n): ").lower() == "y"
-            syrup_name = input("Название сиропа: ").strip() if use_syrup else None
-            syrup_quantity = int(input("Количество сиропа (в мл): ")) if use_syrup else None
-            payment_type = input("Тип оплаты (cash/card): ").lower()
+            print("Введите напитки по одному в строке (пустая строка — конец ввода):")
+            order_items = []
 
-            order_item = OrderItem(
-                menu_item_name=menu_item_name,
-                quantity=quantity,
-                syrup_name=syrup_name,
-                syrup_quantity=syrup_quantity
-            )
+            while True:
+                line = input().strip()
+                if not line:
+                    break
+                parts = line.split()
+
+                try:
+                    quantity = int(parts[-1])
+                except ValueError:
+                    raise ValueError("В конце строки должно быть количество напитков")
+
+                parts = parts[:-1]
+
+                if "сироп" in parts:
+                    syrup_index = parts.index("сироп")
+                    menu_item_name = " ".join(parts[:syrup_index]).strip()
+
+                    try:
+                        syrup_quantity = int(parts[-1])  # мл сиропа
+                        syrup_name = " ".join(parts[syrup_index + 1:-1]).strip()
+
+                    except ValueError:
+                        syrup_quantity = None
+                        syrup_name = " ".join(parts[syrup_index + 1:]).strip()
+
+                else:
+                    menu_item_name = " ".join(parts).strip()
+                    syrup_name = None
+                    syrup_quantity = None
+
+                order_items.append(OrderItem(
+                    menu_item_name=menu_item_name,
+                    quantity=quantity,
+                    syrup_name=syrup_name,
+                    syrup_quantity=syrup_quantity
+                ))
+
+            payment_type = input("Тип оплаты (cash/card): ").lower()
 
             try:
                 result = order_service.create_order(
                     customer_name=customer_name,
-                    order_items=[order_item],
+                    order_items=order_items,
                     payment_type=payment_type
                 )
                 print(f"\nЗаказ создан ✅\nID: {result['order_id']}\nСумма: {result['total']}\n")
