@@ -110,15 +110,14 @@ class OrderService:
         for item in order_items:
             recipe = self.menu_repo.get_recipe(item.menu_item_name)
 
+            for syrup_name, qty in recipe.get('syrup', {}).items():
+                syrups_needed[syrup_name] = syrups_needed.get(syrup_name, 0) + (qty or 0) * item.quantity
+
             if item.syrup_name and item.syrup_quantity:
-                syrups_needed[item.syrup_name] = item.syrup_quantity
+                syrups_needed[item.syrup_name] = syrups_needed.get(item.syrup_name, 0) + item.syrup_quantity
 
             for ing_name, qty in recipe.get('ingredient', {}).items():
-                ingredients_needed[ing_name] = ingredients_needed.get(ing_name, 0) + qty * item.quantity
-
-            for syrup_name, qty in recipe.get('syrup', {}).items():
-                if item.syrup_name == syrup_name:
-                    syrups_needed[syrup_name] = syrups_needed.get(syrup_name, 0) + qty * item.syrup_quantity
+                ingredients_needed[ing_name] = ingredients_needed.get(ing_name, 0) + (qty or 0) * item.quantity
 
         self.stock_repo.consume_items(ingredients_needed, 'ingredient')
 

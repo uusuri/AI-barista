@@ -5,6 +5,7 @@ class OrderRepository:
     def __init__(self, conn: sqlite3.Connection):
         self.conn = conn
 
+
     def create_order(self, customer_name: str, total_sum: float, type_of_payment: str) -> int:
         cursor = self.conn.cursor()
         cursor.execute(
@@ -15,6 +16,7 @@ class OrderRepository:
             (customer_name, total_sum, type_of_payment)
         )
         return cursor.lastrowid
+
 
     def add_order_item(
         self,
@@ -40,6 +42,7 @@ class OrderRepository:
             self.add_syrup_to_item(item_id, syrup_name, syrup_quantity)
 
         return item_id
+
 
     def add_syrup_to_item(
         self,

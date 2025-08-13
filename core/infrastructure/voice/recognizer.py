@@ -2,7 +2,7 @@ import vosk
 import pyaudio
 
 def recognize_speech_vosk():
-    model = vosk.Model("/data/vosk-model-ru-0.42")
+    model = vosk.Model("/Users/uusuri/PycharmProjects/AI-barista/data/vosk-model-ru-0.42")
     recognizer = vosk.KaldiRecognizer(model, 16000)
 
     mic = pyaudio.PyAudio()

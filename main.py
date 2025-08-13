@@ -68,7 +68,7 @@ def main():
                     menu_item_name = " ".join(parts[:syrup_index]).strip()
 
                     try:
-                        syrup_quantity = int(parts[-1])  # мл сиропа
+                        syrup_quantity = int(parts[-1])
                         syrup_name = " ".join(parts[syrup_index + 1:-1]).strip()
 
                     except ValueError:
