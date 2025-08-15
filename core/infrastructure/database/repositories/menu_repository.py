@@ -13,16 +13,35 @@ class MenuRepository:
     def __init__(self, connection: sqlite3.Connection):
         self.conn = connection
 
+
     def add_item(self, name: str, price: float, is_available: bool) -> int:
         query = "INSERT INTO menu (name, price, is_available) VALUES (?, ?, ?)"
         with self.conn:
             cursor = self.conn.execute(query, (name, price, is_available))
             return cursor.lastrowid
 
+
     def update_item(self, name: str, price: float, is_available: bool) -> None:
         query = "UPDATE menu SET price = ?, is_available = ? WHERE name = ?"
         with self.conn:
             self.conn.execute(query, (price, is_available, name))
+
+
+    def delete_item(self, item_id: int) -> None:
+        query = "DELETE FROM menu WHERE id = ?"
+        with self.conn:
+            self.conn.execute(query, (item_id,))
+
+
+    def get_price(self, menu_item_name: str) -> float:
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT price FROM menu WHERE name = ?", (menu_item_name,))
+        row = cursor.fetchone()
+        if not row:
+            cursor.execute("SELECT price_per_portion FROM syrups WHERE name = ?", (menu_item_name,))
+            row = cursor.fetchone()
+        return row[0]
+
 
     def get_recipe(self, menu_item_name: str) -> Dict[str, Dict[str, float]]:
         cursor = self.conn.cursor()
@@ -47,17 +66,16 @@ class MenuRepository:
         return recipe
 
 
-    def get_price(self, menu_item_name: str) -> float:
+    def get_full_menu_items(self) -> dict[str, str]:
         cursor = self.conn.cursor()
-        cursor.execute("SELECT price FROM menu WHERE name = ?", (menu_item_name,))
-        row = cursor.fetchone()
-        if not row:
-            cursor.execute("SELECT price_per_portion FROM syrups WHERE name = ?", (menu_item_name,))
-            row = cursor.fetchone()
-        return row[0]
 
+        cursor.execute("SELECT name FROM menu")
+        drinks = [row[0] for row in cursor.fetchall()]
 
-    def delete_item(self, item_id: int) -> None:
-        query = "DELETE FROM menu WHERE id = ?"
-        with self.conn:
-            self.conn.execute(query, (item_id,))
+        cursor.execute("SELECT name FROM syrups")
+        syrups = [row[0] for row in cursor.fetchall()]
+
+        return {
+            "drinks": ", ".join(drinks),
+            "syrups": ", ".join(syrups),
+        }

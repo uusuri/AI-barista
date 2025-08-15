@@ -26,6 +26,9 @@ def main():
             price = float(input("Цена: "))
             menu_service.add_menu_item(name, price)
 
+        elif action == "menu":
+            print(menu_service.get_full_menu_items())
+
         elif action == "update":
             name = input("Введите название обновляемой позиции: ").strip()
             price = float(input("Введите стоимость обновляемой позиции: "))

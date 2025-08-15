@@ -35,3 +35,8 @@ class MenuService:
         if not recipe:
             raise ValueError(f"Рецепт для '{name}' не найден")
         return recipe
+
+
+    def get_full_menu_items(self):
+        menu = self.menu_repo.get_full_menu_items()
+        return menu
