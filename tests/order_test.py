@@ -22,6 +22,9 @@ def test_large_order():
         'латте': {
             'ingredient': {'зерно арабика': 18.5, 'молоко': 200},
             'syrup': {'лавандовый': 100}
+        },
+        'эспрессо тоник':{
+            'ingredient': {'зерно арабика': 18.5, 'тоник': 150},
         }
     }[name]
 
@@ -30,6 +33,7 @@ def test_large_order():
         'американо': 200,
         'бамбл': 350,
         'латте': 290,
+        'эспрессо тоник': 250,
         'лавандовый': 40,
         'мятный': 40,
         'ванильный': 40
@@ -42,6 +46,7 @@ def test_large_order():
 
     order_items = [
         OrderItem(menu_item_name='раф лавандовый', quantity=1, syrup_name='мятный', syrup_quantity=10),
+        OrderItem(menu_item_name='эспрессо тоник', quantity=1),
         OrderItem(menu_item_name='американо', quantity=1),
         OrderItem(menu_item_name='бамбл', quantity=1, syrup_name='ванильный', syrup_quantity=10),
         OrderItem(menu_item_name='латте', quantity=1, syrup_name='лавандовый', syrup_quantity=100)
@@ -54,8 +59,9 @@ def test_large_order():
     assert stock_repo.consume_items.called
 
     expected_ingredients = {
-        'зерно арабика': 18.5*4,
+        'зерно арабика': 18.5 * 5,
         'молоко лавандовое': 100,
+        'тоник': 150,
         'сливки': 50,
         'мед': 15,
         'лимонный сок': 10,

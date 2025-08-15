@@ -43,8 +43,6 @@ def main():
             name = input("Введите название позиции: ").strip()
             print(menu_service.get_recipe(name))
 
-
-
         elif action == "order":
             customer_name = input("Имя клиента: ").strip()
             print("Введите напитки по одному в строке (пустая строка — конец ввода):")
