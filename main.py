@@ -8,6 +8,11 @@ from core.infrastructure.services import MenuService, OrderService
 from core.infrastructure.services import OrderItem
 
 
+# from ai_assistant.assistant_repository import AssistantRepository
+# from ai_assistant.assistant_service import AssistantService
+# from ai_assistant.parser import clean_dialogue
+# import re
+
 def main():
     conn = DatabaseManager().get_connection()
 
@@ -17,6 +22,21 @@ def main():
 
     menu_service = MenuService(menu_repo, stock_repo)
     order_service = OrderService(stock_repo, menu_repo, order_repo)
+
+    # dialogue = clean_dialogue(["Добрый день, Ань, какие у тебя длинные ногти ",
+    #           "Здравствуйте, спасибо)) Что посоветуешь сегодня? ",
+    #           "Ну, наверное латте, давай. Хотя нет, давай лучше фраппучино ",
+    #           "Хорошо, что-то еще? ",
+    #           "Да, добавь карамельный сироп Хорошо, одну минуту"])
+    #
+    # menu = menu_service.get_full_menu_items()
+    #
+    # repo = AssistantRepository(model= "gemma3:12b")
+    # service = AssistantService(repo, menu)
+    #
+    # order = service.extract_order(dialogue)
+    # ans = re.sub(r"```json|```", "", str(order)).strip()
+    # print(ans)
 
     try:
         action = input("Действие (add/update/delete/stock/recipe/order): ").lower()

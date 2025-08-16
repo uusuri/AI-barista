@@ -16,7 +16,7 @@ def remove_words(text: str) -> str:
     return text
 
 
-def clean_dialog(dialog_lines: list[str]) -> str:
+def clean_dialogue(dialog_lines: list[str]) -> str:
     cleaned_lines = []
     for line in dialog_lines:
         cleaned = re.sub(r'[?,!.]', '', remove_words(line))

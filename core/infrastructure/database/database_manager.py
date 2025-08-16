@@ -1,10 +1,14 @@
+import os
 import sqlite3
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class DatabaseManager:
     _instance = None
 
-    def __new__(cls, db_path: str = "/Users/uusuri/PycharmProjects/AI-barista/data/coffee_shop.db"):
+    def __new__(cls, db_path: str = os.getenv('DB_PATH')):
         if not cls._instance:
             cls._instance = super().__new__(cls)
             cls._instance.db_path = Path(__file__).parent.parent.parent / db_path
