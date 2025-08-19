@@ -21,11 +21,14 @@ def main():
     menu_service = MenuService(menu_repo, stock_repo)
     order_service = OrderService(stock_repo, menu_repo, order_repo)
 
-    dialogue = clean_dialogue(["Добрый день, Ань, какие у тебя длинные ногти ",
-              "Здравствуйте, спасибо)) Что посоветуешь сегодня? ",
-              "Ну, наверное латте, давай. Хотя нет, давай лучше фраппучино ",
+    dialogue = clean_dialogue(["Добрый день, какая хорошая сегодня погода ",
+              "Здравствуйте, да. "
+              "Что посоветуешь сегодня? ",
+              "Советую попробовать наш капучино. "
+              "Да, давайте, спасибо"
               "Хорошо, что-то еще? ",
-              "Да, добавь карамельный сироп Хорошо, одну минуту"])
+              "Да, американо без сахара, а в капучино добавь ванильный сироп ",
+              "Хорошо, одну минуту"])
 
     menu = menu_service.get_full_menu_items()
 
@@ -34,6 +37,7 @@ def main():
 
     response = repo.get_response(dialogue)
     order = service.extract_order(response)
+
     print(order)
 
     try:
@@ -67,38 +71,25 @@ def main():
 
             case "order":
                 customer_name = input("Имя клиента: ").strip()
-                print("Введите напитки по одному в строке (пустая строка — конец ввода):")
+                raw_items = order.split(",")
                 order_items = []
 
-                while True:
-                    line = input().strip()
-                    if not line:
-                        break
-                    parts = line.split()
+                for item_in_order in raw_items:
+                    parts = item_in_order.strip().split()
 
-                    try:
-                        quantity = int(parts[-1])
-                    except ValueError:
-                        raise ValueError("В конце строки должно быть количество напитков")
+                    quantity = int(parts[-1])
 
-                    parts = parts[:-1]
+                    menu_item_name = " ".join(parts[:-1])
+                    syrup_name = None
+                    syrup_quantity = None
 
                     if "сироп" in parts:
                         syrup_index = parts.index("сироп")
-                        menu_item_name = " ".join(parts[:syrup_index]).strip()
 
-                        try:
-                            syrup_quantity = int(parts[-1])
-                            syrup_name = " ".join(parts[syrup_index + 1:-1]).strip()
-
-                        except ValueError:
-                            syrup_quantity = None
-                            syrup_name = " ".join(parts[syrup_index + 1:]).strip()
-
-                    else:
-                        menu_item_name = " ".join(parts).strip()
-                        syrup_name = None
-                        syrup_quantity = None
+                        menu_item_name = " ".join(parts[:syrup_index])
+                        syrup_name = parts[syrup_index + 1]
+                        syrup_quantity = int(parts[-2])
+                        quantity = int(parts[-1])
 
                     order_items.append(OrderItem(
                         menu_item_name=menu_item_name,
@@ -107,17 +98,17 @@ def main():
                         syrup_quantity=syrup_quantity
                     ))
 
-                payment_type = input("Тип оплаты (cash/card): ").lower()
+                    payment_type = input("Тип оплаты (cash/card): ").lower()
 
-                try:
-                    result = order_service.create_order(
-                        customer_name=customer_name,
-                        order_items=order_items,
-                        payment_type=payment_type
-                    )
-                    print(f"\nЗаказ создан ✅\nID: {result['order_id']}\nСумма: {result['total']}\n")
-                except ValueError as e:
-                    print(f"\nОшибка при создании заказа ❌: {e}")
+                    try:
+                        result = order_service.create_order(
+                            customer_name=customer_name,
+                            order_items=order_items,
+                            payment_type=payment_type
+                        )
+                        print(f"\nЗаказ создан ✅\nID: {result['order_id']}\nСумма: {result['total']}\n")
+                    except ValueError as e:
+                        print(f"\nОшибка при создании заказа ❌: {e}")
 
     finally:
         conn.close()
