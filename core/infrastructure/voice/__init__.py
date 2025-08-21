@@ -1,0 +1,2 @@
+from .recognizer_repository import RecognizerRepository
+from .recognizer_service import RecognizerService

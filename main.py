@@ -11,24 +11,24 @@ from ai_assistant.assistant_repository import AssistantRepository
 from ai_assistant.assistant_service import AssistantService
 from ai_assistant.parser import clean_dialogue
 
+from core.infrastructure.voice import RecognizerRepository
+from core.infrastructure.voice import RecognizerService
+
 def main():
     conn = DatabaseManager().get_connection()
 
     menu_repo = MenuRepository(conn)
     stock_repo = StockRepository(conn)
     order_repo = OrderRepository(conn)
+    recognizer_repository = RecognizerRepository("output.wav", 5)
 
+    recognizer_service = RecognizerService('turbo', recognizer_repository)
     menu_service = MenuService(menu_repo, stock_repo)
     order_service = OrderService(stock_repo, menu_repo, order_repo)
 
-    dialogue = clean_dialogue(["Добрый день, какая хорошая сегодня погода ",
-              "Здравствуйте, да. "
-              "Что посоветуешь сегодня? ",
-              "Советую попробовать наш капучино. ",
-              "Да, давайте, спасибо ",
-              "Хорошо, что-то еще? ",
-              "Да, американо без сахара, а в капучино добавь ванильный сироп ",
-              "Хорошо, одну минуту"])
+    dialogue = clean_dialogue(recognizer_service.transcribe_dialogue())
+
+    print(dialogue)
 
     menu = menu_service.get_full_menu_items()
 

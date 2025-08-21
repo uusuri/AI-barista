@@ -1,9 +1,23 @@
+import os
 from faster_whisper import WhisperModel
+from .recognizer_repository import RecognizerRepository
 
-model_size = "turbo"
+class RecognizerService:
+    def __init__(self, model_size = "turbo", repository = RecognizerRepository("output.wav", 5)):
+        self.model = WhisperModel(model_size, device='cpu', compute_type='int8')
+        self.repository = repository
 
-model = WhisperModel(model_size, device="cpu", compute_type="int8")
-segments, info = model.transcribe("123.wav", beam_size=7)
+    @staticmethod
+    def delete_temp_file(filename) -> None:
+        os.remove(filename)
 
-for segment in segments:
-    print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.text))
+    def transcribe_dialogue(self) -> list[str]:
+        dialogue = []
+        segments, info = self.model.transcribe(self.repository.OUTPUT_FILENAME, beam_size=1, language="ru", task="transcribe")
+
+        for segment in segments:
+            dialogue.append(segment.text)
+
+        self.delete_temp_file(self.repository.OUTPUT_FILENAME)
+
+        return dialogue
