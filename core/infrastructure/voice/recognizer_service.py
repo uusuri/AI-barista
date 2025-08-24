@@ -3,7 +3,7 @@ from faster_whisper import WhisperModel
 from .recognizer_repository import RecognizerRepository
 
 class RecognizerService:
-    def __init__(self, model_size = "turbo", repository = RecognizerRepository("output.wav", 5)):
+    def __init__(self, model_size = "turbo", repository = RecognizerRepository("output.wav", 8)):
         self.model = WhisperModel(model_size, device='cpu', compute_type='int8')
         self.repository = repository
 

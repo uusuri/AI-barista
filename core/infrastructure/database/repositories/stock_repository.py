@@ -53,7 +53,6 @@ class StockRepository:
         self.conn.commit()
         return True
 
-
     def get_low_stock_items(self) -> List[Tuple[str, float]]:
         query = """
         SELECT name, current_quantity 

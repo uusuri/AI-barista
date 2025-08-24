@@ -5,7 +5,6 @@ REMOVE_WORDS = [
     "все хорошо", "всё хорошо", "спасибо", "пожалуйста"
 ]
 
-
 def remove_words(text: str) -> str:
     text = text.lower().strip()
 
@@ -14,7 +13,6 @@ def remove_words(text: str) -> str:
 
     text = re.sub(r"\s+", " ", text).strip()
     return text
-
 
 def clean_dialogue(dialog_lines: list[str]) -> str:
     cleaned_lines = []

@@ -8,13 +8,11 @@ from core.infrastructure.database.repositories.stock_repository import StockRepo
 load_dotenv()
 TOKEN = os.getenv("BOT_TOKEN")
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Привет! Я бот для учета остатков.\n"
         "Напиши /stock чтобы проверить, чего мало на складе"
     )
-
 
 async def stock_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -34,7 +32,6 @@ async def stock_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text("😢 Ошибка при проверке склада")
 
-
 def run_bot():
     app = Application.builder().token(TOKEN).build()
 
@@ -43,7 +40,6 @@ def run_bot():
 
     print("Бот запущен...")
     app.run_polling()
-
 
 if __name__ == "__main__":
     run_bot()

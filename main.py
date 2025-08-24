@@ -20,15 +20,13 @@ def main():
     menu_repo = MenuRepository(conn)
     stock_repo = StockRepository(conn)
     order_repo = OrderRepository(conn)
-    recognizer_repository = RecognizerRepository("output.wav", 5)
+    recognizer_repository = RecognizerRepository("output.wav", 8)
 
     recognizer_service = RecognizerService('turbo', recognizer_repository)
     menu_service = MenuService(menu_repo, stock_repo)
     order_service = OrderService(stock_repo, menu_repo, order_repo)
 
     dialogue = clean_dialogue(recognizer_service.transcribe_dialogue())
-
-    print(dialogue)
 
     menu = menu_service.get_full_menu_items()
 
@@ -99,16 +97,18 @@ def main():
                     ))
 
                     payment_type = input("Тип оплаты (cash/card): ").lower()
+                    confirm = True if input("Подтвердить оплату? ") == "y" else False
 
-                    try:
-                        result = order_service.create_order(
-                            customer_name=customer_name,
-                            order_items=order_items,
-                            payment_type=payment_type
-                        )
-                        print(f"\nЗаказ создан ✅\nID: {result['order_id']}\nСумма: {result['total']}\n")
-                    except ValueError as e:
-                        print(f"\nОшибка при создании заказа ❌: {e}")
+                    if confirm:
+                        try:
+                            result = order_service.create_order(
+                                customer_name=customer_name,
+                                order_items=order_items,
+                                payment_type=payment_type
+                            )
+                            print(f"\nЗаказ создан ✅\nID: {result['order_id']}\nСумма: {result['total']}\n")
+                        except ValueError as e:
+                            print(f"\nОшибка при создании заказа ❌: {e}")
 
     finally:
         conn.close()

@@ -43,7 +43,7 @@ class RecognizerRepository:
         self.audio.terminate()
 
 
-rec = RecognizerRepository("output.wav", record_seconds=5)
+rec = RecognizerRepository("output.wav", 8)
 frames = rec.record()
 rec.save_file(frames)
 rec.close()
